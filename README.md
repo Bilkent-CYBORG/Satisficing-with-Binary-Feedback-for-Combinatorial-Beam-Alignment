@@ -50,12 +50,11 @@ The system will auto-detect the number of users based on available channel files
 
 ## Output
 
-The simulation produces:
-1. **Console output**: Progress tracking and final statistics
-2. **Plot**: Comparison of CTS vs SAT-CTS showing satisficing & standard regret
+
+**Plot**: Comparison of CUCB,CTS and SAT-CTS showing satisficing & standard regret
 
 ## Algorithms Compared
 
 - **CTS**: Combinatorial Thompson Sampling
-- **SAT-CTS**: Satisficing Combinatorial Thompson Sampling with hierarchical decision cascade
+- **SAT-CTS**: Satisficing Combinatorial Thompson Sampling with hierarchical decision gate
 - **CUCB**: Combinatorial Upper Confidence Bound
