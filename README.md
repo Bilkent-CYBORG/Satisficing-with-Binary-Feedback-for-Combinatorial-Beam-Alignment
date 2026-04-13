@@ -1,60 +1,86 @@
-# Combinatorial Beam Alignment Simulation
+# SAT-CTS: Satisficing Combinatorial Thompson Sampling
 
-This project implements and compares bandit algorithms for combinatorial beam alignment in wireless communication systems.
+Reference implementation for the paper
+**"Satisficing with Binary Feedback for Combinatorial Beam Alignment"**.
+
+This repository contains the simulation code, plotting scripts, and numerical
+results used to produce the figures and tables in the paper.
+
+## Repository layout
+
+```
+sat-cts-paper-code/
+├── run_combinatorial_simulation.py   # entry point: runs SAT-CTS / SAT-CTS-W / CTS / CUCB
+├── plot_results.py                   # regenerates the four figures from JSONs
+├── results/
+│   ├── real.json                     # realizable regime (τ_r = 8)
+│   ├── non_real.json                 # non-realizable regime (τ_r = 25)
+│   ├── combinatorial_15users_*.json  # 15-user run used for fairness figures
+│   └── *.pdf                         # IEEE-style figures
+└── src/obs/                          # supporting library (copied subset)
+```
 
 ## Setup
 
-### Prerequisites
-- Python 3.9+
-- Virtual environment (recommended)
-
-### Installation
-
-1. Create and activate virtual environment:
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # On macOS/Linux
-# venv\Scripts\activate   # On Windows
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install this package and its dependencies
+pip install -e .
 ```
 
-2. Install dependencies:
-```bash
-pip install numpy<2  # NumPy 1.x required for PyTorch compatibility
-pip install torch scipy matplotlib
-```
+The `deepmimo` package automatically downloads the `city_3_houston_28` scenario
+the first time the simulation runs.
 
-## Running the Simulation
+### Optional: LaTeX for publication-quality figures
+
+`plot_results.py` renders text with LaTeX to match IEEE style. On macOS:
 
 ```bash
-python3 main_for_sim.py
+brew install --cask basictex
+eval "$(/usr/libexec/path_helper)"
 ```
 
-### Configuration
+If LaTeX is not available, set `"text.usetex": False` in
+`plot_results.py` — figures will still render, just with Matplotlib's
+built-in math text.
 
-Edit `main_for_sim.py` to modify simulation parameters:
+## Reproducing the results
 
-```python
-T = 10000                    # Time horizon (number of rounds)
-num_iterations = 100          # Number of experimental iterations
-target_throughput = 10      # Target throughput (bits/symbol per user)
+```bash
+# Regenerate figures from the included JSONs (fast)
+python plot_results.py
+
+# Re-run the full 15-user experiment (slow — several hours on a laptop)
+python run_combinatorial_simulation.py
 ```
 
-### Channel Files
+Results land in `results/` with a timestamp.
 
-Place channel data files in the `channel_data/` directory with naming format:
-- `h_U{user_id}_B{bs_id}.mat` (e.g., `h_U1_B1.mat`, `h_U2_B1.mat`, etc.)
+## Algorithms
 
-The system will auto-detect the number of users based on available channel files.
+| Name          | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| `SAT-CTS`     | Proposed method with LCB → MEAN gate and committed CTS rounds              |
+| `SAT-CTS-W`   | Workshop version (LCB → MEAN → UCB → TS gate, no doubling)                 |
+| `CTS`         | Combinatorial Thompson Sampling (Wang & Chen, 2018)                        |
+| `CUCB`        | Combinatorial UCB (Chen et al., 2013)                                      |
 
-**Note**: Channel files are already organized in the `channel_data/` directory.
+## Citation
 
-## Output
+If you use this code, please cite the paper:
 
+```bibtex
+@article{satcts2025,
+  title   = {Satisficing with Binary Feedback for Combinatorial Beam Alignment},
+  author  = {...},
+  year    = {2025},
+  journal = {...}
+}
+```
 
-**Plot**: Comparison of CUCB,CTS and SAT-CTS showing satisficing & standard regret
+## License
 
-## Algorithms Compared
-
-- **CTS**: Combinatorial Thompson Sampling
-- **SAT-CTS**: Satisficing Combinatorial Thompson Sampling with hierarchical decision gate
-- **CUCB**: Combinatorial Upper Confidence Bound
+MIT — see `LICENSE`.
