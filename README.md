@@ -1,7 +1,7 @@
 # SAT-CTS: Satisficing Combinatorial Thompson Sampling
 
 Reference implementation for the paper
-**"Satisficing with Binary Feedback for Combinatorial Beam Alignment"**.
+**"Multi-User mmWave Beam and Rate Adaptation via Combinatorial Satisficing Bandits"**.
 
 This repository contains the simulation code and plotting scripts used to produce the figures and tables in the paper.
 
