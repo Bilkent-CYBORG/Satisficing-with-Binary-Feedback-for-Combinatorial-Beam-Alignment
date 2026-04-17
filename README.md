@@ -26,14 +26,16 @@ the first time the simulation runs.
 ## Reproducing the results
 
 ```bash
-# Regenerate figures from the included JSONs (fast)
-python plot_results.py
-
-# Re-run the full 15-user experiment (slow — several hours on a laptop)
+# Run the full 15-user experiment (slow — several hours on a laptop)
 python run_combinatorial_simulation.py
+
+# Generate IEEE-style figures from the output JSONs
+python plot_results.py
 ```
 
 Results land in `results/` with a timestamp.
+
+**Note:** `plot_results.py` uses LaTeX for text rendering. On macOS: `brew install --cask basictex`. If LaTeX is unavailable, set `"text.usetex": False` in `plot_results.py`.
 
 ## Algorithms
 
