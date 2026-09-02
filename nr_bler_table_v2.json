@@ -1,0 +1,553 @@
+{
+ "generator": "sionna_nr_ldpc_awgn",
+ "sionna_version": "1.2.1",
+ "tf_version": "2.21.0",
+ "mcs_table": "PDSCH MCS Table 2 (38.214 Table 5.1.3.1-2)",
+ "blocklength_source": "38.214 5.1.3.2 TBS procedure via sionna.phy.nr.utils.calculate_tb_size",
+ "resource_config": {
+  "num_prbs": 4,
+  "num_ofdm_symbols": 14,
+  "num_dmrs_re_per_prb": 12,
+  "num_layers": 1,
+  "num_ov": 0
+ },
+ "ldpc_iterations": 20,
+ "demapper": "app (exact APP LLRs)",
+ "channel": "complex AWGN, Es=1",
+ "block_error_definition": "any info bit wrong in the TB (CRC proxy)",
+ "scope_exclusions": "ideal CSI; no DMRS-based channel estimation, no HARQ/retransmission, single-shot ACK",
+ "created_utc": "2026-07-31T16:42:00Z",
+ "mcs": {
+  "MCS9_Qm4": {
+   "mcs_index": 9,
+   "Qm": 4,
+   "target_coderate": 0.6015625,
+   "spectral_efficiency": 2.40625,
+   "tbs": 1544,
+   "k_ldpc": 1560,
+   "num_cb": 1,
+   "tb_crc": 16,
+   "cb_crc": 0,
+   "delivered_spectral_efficiency": 2.4743589743589745,
+   "n_prime_re": 156,
+   "re_cap_binds": false,
+   "n_cu": 624,
+   "shannon_threshold_db": 6.335640476802958,
+   "points": [
+    {
+     "snr_db": 7.235640476802958,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 7.335640476802958,
+     "bler": 0.996,
+     "blocks": 500,
+     "errors": 498
+    },
+    {
+     "snr_db": 7.435640476802957,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 7.535640476802957,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 7.635640476802957,
+     "bler": 0.994,
+     "blocks": 500,
+     "errors": 497
+    },
+    {
+     "snr_db": 7.735640476802956,
+     "bler": 0.978,
+     "blocks": 500,
+     "errors": 489
+    },
+    {
+     "snr_db": 7.835640476802956,
+     "bler": 0.942,
+     "blocks": 500,
+     "errors": 471
+    },
+    {
+     "snr_db": 7.935640476802956,
+     "bler": 0.878,
+     "blocks": 500,
+     "errors": 439
+    },
+    {
+     "snr_db": 8.035640476802955,
+     "bler": 0.778,
+     "blocks": 500,
+     "errors": 389
+    },
+    {
+     "snr_db": 8.135640476802955,
+     "bler": 0.618,
+     "blocks": 500,
+     "errors": 309
+    },
+    {
+     "snr_db": 8.235640476802955,
+     "bler": 0.478,
+     "blocks": 500,
+     "errors": 239
+    },
+    {
+     "snr_db": 8.335640476802954,
+     "bler": 0.314,
+     "blocks": 1000,
+     "errors": 314
+    },
+    {
+     "snr_db": 8.435640476802954,
+     "bler": 0.198,
+     "blocks": 1500,
+     "errors": 297
+    },
+    {
+     "snr_db": 8.535640476802953,
+     "bler": 0.096,
+     "blocks": 2500,
+     "errors": 240
+    },
+    {
+     "snr_db": 8.635640476802953,
+     "bler": 0.054,
+     "blocks": 4000,
+     "errors": 216
+    },
+    {
+     "snr_db": 8.735640476802953,
+     "bler": 0.024125,
+     "blocks": 8000,
+     "errors": 193
+    },
+    {
+     "snr_db": 8.835640476802952,
+     "bler": 0.009625,
+     "blocks": 8000,
+     "errors": 77
+    },
+    {
+     "snr_db": 8.935640476802952,
+     "bler": 0.004875,
+     "blocks": 8000,
+     "errors": 39
+    }
+   ],
+   "wall_s": 54.3,
+   "snr_at_bler_0.1_db": 8.530001447631692,
+   "snr_at_bler_0.5_db": 8.218123439879395,
+   "snr_at_bler_0.9_db": 7.900466182233874,
+   "implementation_gap_db": 2.1943609708287344,
+   "width_10_90_db": 0.6295352653978181,
+   "G_rate_matched_bits": 2496,
+   "coderate_crc_inc": 0.625,
+   "coderate_tbs_over_G": 0.6185897435897436,
+   "ldpc_base_graph": "bg2",
+   "ldpc_lifting_Z": 160,
+   "ldpc_mother_codeword_bits": 8000,
+   "rate_matching_punctured_bits": 5504,
+   "encoder_coderate": 0.625
+  },
+  "MCS15_Qm6": {
+   "mcs_index": 15,
+   "Qm": 6,
+   "target_coderate": 0.650390625,
+   "spectral_efficiency": 3.90234375,
+   "tbs": 2472,
+   "k_ldpc": 2488,
+   "num_cb": 1,
+   "tb_crc": 16,
+   "cb_crc": 0,
+   "delivered_spectral_efficiency": 3.9615384615384617,
+   "n_prime_re": 156,
+   "re_cap_binds": false,
+   "n_cu": 624,
+   "shannon_threshold_db": 11.446613665764012,
+   "points": [
+    {
+     "snr_db": 12.846613665764012,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 12.946613665764012,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 13.046613665764012,
+     "bler": 0.998,
+     "blocks": 500,
+     "errors": 499
+    },
+    {
+     "snr_db": 13.146613665764011,
+     "bler": 0.998,
+     "blocks": 500,
+     "errors": 499
+    },
+    {
+     "snr_db": 13.246613665764011,
+     "bler": 0.998,
+     "blocks": 500,
+     "errors": 499
+    },
+    {
+     "snr_db": 13.34661366576401,
+     "bler": 0.974,
+     "blocks": 500,
+     "errors": 487
+    },
+    {
+     "snr_db": 13.44661366576401,
+     "bler": 0.948,
+     "blocks": 500,
+     "errors": 474
+    },
+    {
+     "snr_db": 13.54661366576401,
+     "bler": 0.876,
+     "blocks": 500,
+     "errors": 438
+    },
+    {
+     "snr_db": 13.64661366576401,
+     "bler": 0.726,
+     "blocks": 500,
+     "errors": 363
+    },
+    {
+     "snr_db": 13.74661366576401,
+     "bler": 0.53,
+     "blocks": 500,
+     "errors": 265
+    },
+    {
+     "snr_db": 13.846613665764009,
+     "bler": 0.418,
+     "blocks": 500,
+     "errors": 209
+    },
+    {
+     "snr_db": 13.946613665764009,
+     "bler": 0.267,
+     "blocks": 1000,
+     "errors": 267
+    },
+    {
+     "snr_db": 14.046613665764008,
+     "bler": 0.135,
+     "blocks": 2000,
+     "errors": 270
+    },
+    {
+     "snr_db": 14.146613665764008,
+     "bler": 0.061714285714285715,
+     "blocks": 3500,
+     "errors": 216
+    },
+    {
+     "snr_db": 14.246613665764007,
+     "bler": 0.024125,
+     "blocks": 8000,
+     "errors": 193
+    },
+    {
+     "snr_db": 14.346613665764007,
+     "bler": 0.008875,
+     "blocks": 8000,
+     "errors": 71
+    },
+    {
+     "snr_db": 14.446613665764007,
+     "bler": 0.00275,
+     "blocks": 8000,
+     "errors": 22
+    }
+   ],
+   "wall_s": 80.9,
+   "snr_at_bler_0.1_db": 14.08495298378965,
+   "snr_at_bler_0.5_db": 13.771158735049386,
+   "snr_at_bler_0.9_db": 13.512395136821976,
+   "implementation_gap_db": 2.638339318025638,
+   "width_10_90_db": 0.5725578469676744,
+   "G_rate_matched_bits": 3744,
+   "coderate_crc_inc": 0.6645299145299145,
+   "coderate_tbs_over_G": 0.6602564102564102,
+   "ldpc_base_graph": "bg2",
+   "ldpc_lifting_Z": 256,
+   "ldpc_mother_codeword_bits": 12800,
+   "rate_matching_punctured_bits": 9056,
+   "encoder_coderate": 0.6645299145299145
+  },
+  "MCS21_Qm8": {
+   "mcs_index": 21,
+   "Qm": 8,
+   "target_coderate": 0.6943359375,
+   "spectral_efficiency": 5.5546875,
+   "tbs": 3496,
+   "k_ldpc": 3512,
+   "num_cb": 1,
+   "tb_crc": 16,
+   "cb_crc": 0,
+   "delivered_spectral_efficiency": 5.602564102564102,
+   "n_prime_re": 156,
+   "re_cap_binds": false,
+   "n_cu": 624,
+   "shannon_threshold_db": 16.62788173330556,
+   "points": [
+    {
+     "snr_db": 18.52788173330556,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 18.62788173330556,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 18.727881733305562,
+     "bler": 0.998,
+     "blocks": 500,
+     "errors": 499
+    },
+    {
+     "snr_db": 18.827881733305563,
+     "bler": 0.996,
+     "blocks": 500,
+     "errors": 498
+    },
+    {
+     "snr_db": 18.927881733305565,
+     "bler": 0.994,
+     "blocks": 500,
+     "errors": 497
+    },
+    {
+     "snr_db": 19.027881733305566,
+     "bler": 0.938,
+     "blocks": 500,
+     "errors": 469
+    },
+    {
+     "snr_db": 19.127881733305568,
+     "bler": 0.88,
+     "blocks": 500,
+     "errors": 440
+    },
+    {
+     "snr_db": 19.22788173330557,
+     "bler": 0.764,
+     "blocks": 500,
+     "errors": 382
+    },
+    {
+     "snr_db": 19.32788173330557,
+     "bler": 0.592,
+     "blocks": 500,
+     "errors": 296
+    },
+    {
+     "snr_db": 19.427881733305572,
+     "bler": 0.413,
+     "blocks": 1000,
+     "errors": 413
+    },
+    {
+     "snr_db": 19.527881733305573,
+     "bler": 0.241,
+     "blocks": 1000,
+     "errors": 241
+    },
+    {
+     "snr_db": 19.627881733305575,
+     "bler": 0.117,
+     "blocks": 2000,
+     "errors": 234
+    },
+    {
+     "snr_db": 19.727881733305576,
+     "bler": 0.06371428571428571,
+     "blocks": 3500,
+     "errors": 223
+    },
+    {
+     "snr_db": 19.827881733305578,
+     "bler": 0.02075,
+     "blocks": 8000,
+     "errors": 166
+    },
+    {
+     "snr_db": 19.92788173330558,
+     "bler": 0.00825,
+     "blocks": 8000,
+     "errors": 66
+    },
+    {
+     "snr_db": 20.02788173330558,
+     "bler": 0.002375,
+     "blocks": 8000,
+     "errors": 19
+    }
+   ],
+   "wall_s": 163.7,
+   "snr_at_bler_0.1_db": 19.65371469748635,
+   "snr_at_bler_0.5_db": 19.37479030017832,
+   "snr_at_bler_0.9_db": 19.092673296211196,
+   "implementation_gap_db": 3.0258329641807897,
+   "width_10_90_db": 0.5610414012751548,
+   "G_rate_matched_bits": 4992,
+   "coderate_crc_inc": 0.7035256410256411,
+   "coderate_tbs_over_G": 0.7003205128205128,
+   "ldpc_base_graph": "bg1",
+   "ldpc_lifting_Z": 160,
+   "ldpc_mother_codeword_bits": 10560,
+   "rate_matching_punctured_bits": 5568,
+   "encoder_coderate": 0.7035256410256411
+  },
+  "MCS24_Qm8": {
+   "mcs_index": 24,
+   "Qm": 8,
+   "target_coderate": 0.8212890625,
+   "spectral_efficiency": 6.5703125,
+   "tbs": 4096,
+   "k_ldpc": 4120,
+   "num_cb": 1,
+   "tb_crc": 24,
+   "cb_crc": 0,
+   "delivered_spectral_efficiency": 6.564102564102564,
+   "n_prime_re": 156,
+   "re_cap_binds": false,
+   "n_cu": 624,
+   "shannon_threshold_db": 19.73266854633971,
+   "points": [
+    {
+     "snr_db": 21.13266854633971,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 21.23266854633971,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 21.33266854633971,
+     "bler": 1.0,
+     "blocks": 500,
+     "errors": 500
+    },
+    {
+     "snr_db": 21.432668546339713,
+     "bler": 0.998,
+     "blocks": 500,
+     "errors": 499
+    },
+    {
+     "snr_db": 21.532668546339714,
+     "bler": 0.994,
+     "blocks": 500,
+     "errors": 497
+    },
+    {
+     "snr_db": 21.632668546339715,
+     "bler": 0.97,
+     "blocks": 500,
+     "errors": 485
+    },
+    {
+     "snr_db": 21.732668546339717,
+     "bler": 0.94,
+     "blocks": 500,
+     "errors": 470
+    },
+    {
+     "snr_db": 21.83266854633972,
+     "bler": 0.826,
+     "blocks": 500,
+     "errors": 413
+    },
+    {
+     "snr_db": 21.93266854633972,
+     "bler": 0.682,
+     "blocks": 500,
+     "errors": 341
+    },
+    {
+     "snr_db": 22.03266854633972,
+     "bler": 0.468,
+     "blocks": 500,
+     "errors": 234
+    },
+    {
+     "snr_db": 22.132668546339723,
+     "bler": 0.32,
+     "blocks": 1000,
+     "errors": 320
+    },
+    {
+     "snr_db": 22.232668546339724,
+     "bler": 0.16133333333333333,
+     "blocks": 1500,
+     "errors": 242
+    },
+    {
+     "snr_db": 22.332668546339725,
+     "bler": 0.0876,
+     "blocks": 2500,
+     "errors": 219
+    },
+    {
+     "snr_db": 22.432668546339727,
+     "bler": 0.034166666666666665,
+     "blocks": 6000,
+     "errors": 205
+    },
+    {
+     "snr_db": 22.53266854633973,
+     "bler": 0.01275,
+     "blocks": 8000,
+     "errors": 102
+    },
+    {
+     "snr_db": 22.63266854633973,
+     "bler": 0.003875,
+     "blocks": 8000,
+     "errors": 31
+    }
+   ],
+   "wall_s": 121.8,
+   "snr_at_bler_0.1_db": 22.31098997999183,
+   "snr_at_bler_0.5_db": 22.01510439632542,
+   "snr_at_bler_0.9_db": 21.766303598912252,
+   "implementation_gap_db": 2.578321433652121,
+   "width_10_90_db": 0.544686381079579,
+   "G_rate_matched_bits": 4992,
+   "coderate_crc_inc": 0.8253205128205128,
+   "coderate_tbs_over_G": 0.8205128205128205,
+   "ldpc_base_graph": "bg1",
+   "ldpc_lifting_Z": 192,
+   "ldpc_mother_codeword_bits": 12672,
+   "rate_matching_punctured_bits": 7680,
+   "encoder_coderate": 0.8253205128205128
+  }
+ },
+ "terminology_note": "G_rate_matched_bits is the rate-matched coded-bit count (38.212 5.4.2), NOT the LDPC mother codeword length (66Z for BG1, 50Z for BG2). coderate_crc_inc = (TBS + TB-CRC)/G and equals encoder.coderate here because k passed to the encoder is TBS+CRC. coderate_tbs_over_G = TBS/G excludes the CRC."
+}

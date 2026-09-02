@@ -536,8 +536,10 @@ class Environment:
                     rss[valid_mask, start_idx:end_idx] = rss_valid
 
             self._rss = rss
-
-        self._rss = np.maximum(self._rss, self.eps)
+            # Clamp once, at cache-build time (not on every lookup) -- this
+            # full-matrix maximum over ~31k positions was being recomputed on
+            # every get_rss() call, dominating per-step runtime.
+            self._rss = np.maximum(self._rss, self.eps)
 
         if self.zoom_flag:
             return self._rss[self.pos_mask]

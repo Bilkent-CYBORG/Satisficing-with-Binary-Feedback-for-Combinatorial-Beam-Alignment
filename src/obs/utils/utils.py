@@ -314,3 +314,81 @@ def hungarian_best(values: np.ndarray) -> Tuple[List[int], List[int]]:
     chosen_beams = [int(col_ind[u]) for u in range(U)]
     chosen_rates = [int(best_r[u, col_ind[u]]) for u in range(U)]
     return chosen_beams, chosen_rates
+
+
+def capacitated_best(
+    values: np.ndarray, beam_to_bs: np.ndarray, cap: np.ndarray
+) -> Tuple[List[int], List[int]]:
+    """Optimal matching subject to a per-BS RF-chain cap.
+
+    Same as :func:`hungarian_best`, but additionally enforces the constraint
+    that appears in the paper's super-arm set ``S``::
+
+        |{m : b_m = b}| <= N_RF,b   for every BS b
+
+    Solved exactly as a transportation LP.  The constraint structure is a flow
+    network (UE -> beam -> BS -> sink), so the constraint matrix is totally
+    unimodular and the LP optimum is attained at an integral vertex; no
+    rounding is involved.  A Lagrangian penalty on the BS load was tried first
+    and does NOT work -- a uniform per-BS penalty never breaks ties between
+    users, so they herd onto the same BS and the multiplier diverges.
+
+    Parameters
+    ----------
+    values : np.ndarray
+        Array of shape (num_users, total_beams, num_rates).
+    beam_to_bs : np.ndarray
+        Length ``total_beams``; ``beam_to_bs[b]`` is the BS owning beam ``b``.
+    cap : np.ndarray
+        Length ``num_bs``; per-BS RF-chain capacity.
+
+    Returns
+    -------
+    tuple
+        ``(chosen_beams, chosen_rates)``, one entry per user.
+    """
+    from scipy.optimize import linprog
+    from scipy.sparse import csr_matrix, vstack
+
+    U, Btot, _ = values.shape
+    nbs = len(cap)
+    if int(cap.sum()) < U:
+        raise ValueError(
+            f"infeasible: total RF chains {int(cap.sum())} < users {U}"
+        )
+
+    best_r = values.argmax(axis=2)
+    scores = np.take_along_axis(values, best_r[..., None], axis=2).squeeze(-1)
+
+    nvar = U * Btot
+    # one beam per user (equality)
+    rows = np.repeat(np.arange(U), Btot)
+    cols = np.arange(nvar)
+    A_eq = csr_matrix((np.ones(nvar), (rows, cols)), shape=(U, nvar))
+
+    # each beam used at most once
+    beam_rows = np.tile(np.arange(Btot), U)
+    A_beam = csr_matrix((np.ones(nvar), (beam_rows, cols)), shape=(Btot, nvar))
+    # per-BS RF-chain cap
+    bs_rows = np.tile(beam_to_bs, U)
+    A_bs = csr_matrix((np.ones(nvar), (bs_rows, cols)), shape=(nbs, nvar))
+
+    res = linprog(
+        c=-scores.ravel(),
+        A_ub=vstack([A_beam, A_bs]).tocsr(),
+        b_ub=np.concatenate([np.ones(Btot), np.asarray(cap, dtype=float)]),
+        A_eq=A_eq,
+        b_eq=np.ones(U),
+        bounds=(0, 1),
+        method="highs",
+    )
+    if not res.success:
+        raise RuntimeError(f"capacitated assignment LP failed: {res.message}")
+
+    x = res.x.reshape(U, Btot)
+    chosen_beams = [int(np.argmax(x[u])) for u in range(U)]
+    # Totally unimodular => the vertex is integral. Verify rather than assume.
+    if not np.allclose([x[u, chosen_beams[u]] for u in range(U)], 1.0, atol=1e-6):
+        raise RuntimeError("capacitated assignment LP returned a fractional vertex")
+    chosen_rates = [int(best_r[u, chosen_beams[u]]) for u in range(U)]
+    return chosen_beams, chosen_rates

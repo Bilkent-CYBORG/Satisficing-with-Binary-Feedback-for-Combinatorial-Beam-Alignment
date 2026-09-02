@@ -5,8 +5,6 @@ from .combinatorial import (
     CTSAgent,
     CUCBAgent,
     SATCTSUCBAgent,
-    SATCTSv2Agent,
-    SATCTSv2MemoryAgent,
     SATCTSv2SharedAgent,
 )
 
@@ -15,7 +13,5 @@ __all__ = [
     "CUCBAgent",
     "CTSAgent",
     "SATCTSUCBAgent",
-    "SATCTSv2Agent",
-    "SATCTSv2MemoryAgent",
     "SATCTSv2SharedAgent",
 ]

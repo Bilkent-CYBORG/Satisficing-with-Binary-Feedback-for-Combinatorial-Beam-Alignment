@@ -20,8 +20,14 @@ class CUCBAgent(CombinatorialAlgorithm):
         total_beams: int,
         rate_set: np.ndarray,
         objective: Optional[Objective] = None,
+        clip: bool = False,
     ):
+        # clip=True is the standard CUCB index, min(psi_hat + rad, 1). psi is a
+        # probability, so an index above 1 is not attainable; leaving it
+        # unclipped inflates rarely-played arms without bound. Default False
+        # preserves the behaviour every stored result was produced with.
         super().__init__(num_users, total_beams, rate_set, objective)
+        self.clip = clip
         self._init_state()
 
     def _init_state(self):
@@ -32,11 +38,24 @@ class CUCBAgent(CombinatorialAlgorithm):
         self.psi_hat = np.zeros((self.num_users, self.total_beams, self.num_rates))
 
     def select_action(self, t: int) -> Tuple[List[int], List[int]]:
-        """Select action using UCB on success probabilities."""
+        """Select action using UCB on success probabilities.
+
+        Matches Algorithm 2: the confidence radius is sqrt(3 log t / 2n), and
+        an arm that has never been played carries UCB = +infinity so it is
+        always preferred over any arm with a finite index.
+        """
+        seen = self.n_plays > 0
         n = np.maximum(1, self.n_plays)
-        conf = np.sqrt(2 * np.log(max(2, t)) / n)
-        psi_ucb = self.psi_hat + conf
-        theta_ucb = self.rate_set[None, None, :] * psi_ucb
+        conf = np.sqrt(1.5 * np.log(max(2, t)) / n)  # = sqrt(3 log t / 2n)
+        ucb = self.psi_hat + conf
+        if self.clip:
+            ucb = np.minimum(ucb, 1.0)
+        theta_ucb = self.rate_set[None, None, :] * ucb
+        # +inf cannot be handed to the assignment solver. Any sentinel strictly
+        # above the largest achievable finite index is equivalent: psi <= 1, so
+        # every finite theta is at most max(rate_set). Unplayed arms all share
+        # one sentinel, leaving the tie-break to the solver as +inf would.
+        theta_ucb = np.where(seen, theta_ucb, 10.0 * float(self.rate_set.max()))
         return self.objective.select_assignment(theta_ucb, self.cumulative_throughputs)
 
     def update(self, beams: List[int], rates: List[int], ack_nack: np.ndarray):

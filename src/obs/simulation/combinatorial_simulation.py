@@ -34,6 +34,7 @@ class CombinatorialSimulation(Simulation):
         eps_user: float = 0.0,
         channel_randomness: bool = True,
         channel_randomness_std: float = 5.0,
+        noise_mode: str = "bler",
     ):
         """Initialize combinatorial simulation.
 
@@ -80,7 +81,10 @@ class CombinatorialSimulation(Simulation):
         self.gamma_th = 2**self.rate_set - 1
 
         # Binary reward function
-        super().__init__(environment, BinaryReward(self.rate_set, noise_var))
+        self.noise_mode = noise_mode
+        super().__init__(
+            environment, BinaryReward(self.rate_set, noise_var, mode=noise_mode)
+        )
 
     def create_users(self) -> List[User]:
         """Create users at specified or random valid positions.
@@ -127,9 +131,13 @@ class CombinatorialSimulation(Simulation):
         return users
 
     def _estimate_psi(self, users: List[User]):
-        """Estimate success probabilities for all (user, beam, rate) triplets.
+        """Ground-truth success probabilities for all (user, beam, rate) triplets.
 
-        Uses sigmoid approximation based on SNR margin, same as source.
+        In "bler" mode psi is the SAME anchored BLER waterfall used to generate
+        the ACK/NACK feedback (self.reward_function.success_prob), so feedback
+        and the regret reference are consistent and psi is exact. In "hard"
+        mode psi uses the original margin-sigmoid approximation matching the
+        published repo behavior. Uses the fixed (noiseless) RSS in both cases.
 
         Parameters
         ----------
@@ -143,13 +151,28 @@ class CombinatorialSimulation(Simulation):
         for u, user in enumerate(users):
             rss = user.get_rss()
             snr = rss / self.noise_var
-
-            thr = self.gamma_th[None, :]
-            snr_expanded = snr[:, None]
-
-            margin = (snr_expanded - thr) / np.sqrt(np.maximum(thr, 1.0))
-            margin_clipped = np.clip(0.5 * margin, -30, 30)
-            self.psi[u] = 1.0 / (1.0 + np.exp(-margin_clipped))
+            if self.noise_mode == "bler":
+                # fixed-SNR block-error only (exact, closed form)
+                for r in range(self.num_rates):
+                    self.psi[u, :, r] = self.reward_function.success_prob(snr, r)
+            elif self.noise_mode == "hard_bler":
+                # combined: E_shift[ 1 - BLER_r(SNR_shifted) ], Monte-Carlo
+                # over beam-misalignment realizations (matches the feedback,
+                # which draws a BLER Bernoulli at the shifted SNR each slot).
+                n_mc = 200
+                acc = np.zeros((total_beams, self.num_rates))
+                for _ in range(n_mc):
+                    snr_sh = user.get_observed_rss() / self.noise_var
+                    for r in range(self.num_rates):
+                        acc[:, r] += self.reward_function.success_prob(snr_sh, r)
+                self.psi[u] = acc / n_mc
+            else:
+                # "hard": original margin-sigmoid on fixed SNR (repro repo)
+                thr = self.gamma_th[None, :]
+                snr_expanded = snr[:, None]
+                margin = (snr_expanded - thr) / np.sqrt(np.maximum(thr, 1.0))
+                margin_clipped = np.clip(0.5 * margin, -30, 30)
+                self.psi[u] = 1.0 / (1.0 + np.exp(-margin_clipped))
 
         # Compute optimal throughput for standard regret
         self._compute_optimal_throughput(users)
