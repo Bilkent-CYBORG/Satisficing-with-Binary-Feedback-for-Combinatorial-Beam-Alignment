@@ -68,5 +68,5 @@ def rf_chains(num_users, num_bs):
 
 DM_FEEDBACK_P = float(os.environ.get("FEEDBACK_P", 1.0))
 
-DM_BEAM_EXCLUSIVE = int(os.environ.get("BEAM_EXCLUSIVE", 1))
+DM_BEAM_EXCLUSIVE = int(os.environ.get("BEAM_EXCLUSIVE", 0))
 

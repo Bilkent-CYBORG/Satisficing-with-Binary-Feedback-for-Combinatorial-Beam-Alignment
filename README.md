@@ -20,8 +20,10 @@ angles and powers per (UE, BS) link, fixed for the horizon; on top of them
 has a closed form, which is what lets `g*` be computed without Monte-Carlo
 noise. The setup is `M = 15` UEs, `B = 3` BSs, `N = 64`-element ULAs and
 `K = 120` DFT beams over `R = 4` rates from TS 38.214 MCS Table 2, i.e. 21,600
-base arms; assignment is Hungarian on the rate-collapsed `M × BK` matrix, or a
-capacitated transportation LP when the per-BS RF-chain cap binds. `P_tx = 30`
+base arms; each UE independently takes its best (beam, rate) pair, since
+codewords may be reused across UEs on orthogonal sub-channels, and a
+Hungarian assignment over per-BS RF-chain slots is solved only when the
+per-BS cap binds. `P_tx = 30`
 dBm and `NF = 7` dB are the only assumed numbers and enter as a single additive
 constant on every arm.
 
@@ -66,7 +68,7 @@ random number is drawn.
 | `PTX_DBM`, `NF_DB` | 30, 7 | transmit power [dBm] and receiver noise figure [dB] |
 | `BLER_TABLE` | `nr_bler_table_v2.json` | which measured decoder table to use |
 | `N_RF` | `ceil(1.5*M/B)` | per-BS RF-chain cap, applied to every method; `0` disables it |
-| `BEAM_EXCLUSIVE` | 1 | `1` = a codeword serves at most one UE per slot; `0` lets UEs share a beam |
+| `BEAM_EXCLUSIVE` | 0 | `0` lets UEs share a codeword on orthogonal sub-channels; `1` = a codeword serves at most one UE per slot |
 | `FEEDBACK_P` | 1.0 | ACK/NACK feedback reliability |
 | `DM_MIN_PATHS` | 1 | minimum ray-traced paths per link at a UE position |
 | `DM_REQUIRE_LOS` | 0 | minimum LoS links a UE position must have |
