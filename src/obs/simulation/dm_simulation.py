@@ -16,8 +16,7 @@ from obs.config import (
     DM_BLOCK_DB,
     DM_FEEDBACK_P,
     DM_INTERFERENCE,
-    DM_N_RF,
-    UNCAPPED_METHODS,
+    rf_chains,
 )
 from obs.simulation.bler import success_prob
 from obs.simulation.ground_truth import estimate_psi, optimal_throughput
@@ -65,7 +64,7 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
     from obs.config import NR_RATE_SET
     rate_set = np.array(NR_RATE_SET) if rate_set is None else rate_set
     methods = list(methods) if methods else list(NAMES)
-    n_rf = DM_N_RF if n_rf is None else n_rf
+    n_rf = rf_chains(num_users, num_bs) if n_rf is None else n_rf
     feedback_p = DM_FEEDBACK_P if feedback_p is None else float(feedback_p)
     interference = DM_INTERFERENCE if interference is None else interference
     rng = np.random.default_rng(seed)
@@ -226,7 +225,6 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
                                         (users[0].p01 + users[0].p10))
                                   if users[0].p01 > 0 else 0.0),
             "regret_benchmark_note": _BENCHMARK_NOTE,
-            "uncapped_methods": list(UNCAPPED_METHODS),
             "rf_cap_stats": ({"oracle_calls": objective.n_calls,
                               "capped_calls": objective.n_capped,
                               "capped_frac": (objective.n_capped

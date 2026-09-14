@@ -93,12 +93,11 @@ def main():
                       "num_users": M, "num_bs": B, "K": K, "N_antennas": NANT,
                       "total_beams": B * K, "N_RF_per_bs": res["n_rf"],
                       "rf_cap_stats": res["rf_cap_stats"],
-                      "uncapped_methods": res["uncapped_methods"],
                       "rf_cap_note": (
                           "per-BS RF-chain cap |{m : b_m = b}| <= N_RF enforced "
                           "exactly (Hungarian first, transportation LP only when "
-                          "the cap binds). Methods in uncapped_methods run "
-                          "WITHOUT the cap, i.e. on a larger feasible set."),
+                          "the cap binds). Every method uses the same "
+                          "oracle and the same feasible set."),
                       "base_arms": M * B * K * len(R.NR_RATE_SET),
                       "metric_stride": STRIDE,
                       "geometry": gm,

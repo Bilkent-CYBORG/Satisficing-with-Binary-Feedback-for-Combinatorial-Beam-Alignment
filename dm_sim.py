@@ -40,7 +40,7 @@ import os
 import numpy as np
 
 from obs.config import (
-    DM_NOISE_DBM, DM_N_RF, DM_PTX_DBM, DM_SCENARIO, MODEL_NAME, NR_RATE_SET,
+    DM_NOISE_DBM, DM_PTX_DBM, DM_SCENARIO, MODEL_NAME, NR_RATE_SET, rf_chains,
 )
 from obs.simulation.bler import (
     BLER_TABLE_PATH, measured_bler, measured_success_prob, success_prob,
@@ -73,7 +73,8 @@ def main():
 
     print(f"[cfg] {MODEL_NAME} scenario={DM_SCENARIO} T={T} iters={n_exp} "
           f"target={target} L={npaths} "
-          f"P_tx={DM_PTX_DBM} dBm noise={DM_NOISE_DBM:.2f} dBm N_RF={DM_N_RF} "
+          f"P_tx={DM_PTX_DBM} dBm noise={DM_NOISE_DBM:.2f} dBm "
+          f"N_RF={rf_chains(M, nbs)} "
           f"bler={os.path.basename(BLER_TABLE_PATH)} methods={methods}",
           flush=True)
 
@@ -103,11 +104,10 @@ def main():
            "total_beams": nbs * Kb, "base_arms": M * nbs * Kb * len(NR_RATE_SET),
            "crn": res["crn"], "selection_stride": res["selection_stride"],
            "N_RF_per_bs": res["n_rf"], "rf_cap_stats": res["rf_cap_stats"],
-           "uncapped_methods": res["uncapped_methods"],
            "feasible_set_note": ("every method receives the same assignment "
                                  "oracle, the same per-BS RF-chain cap and the "
-                                 "same beam-reuse policy; uncapped_methods "
-                                 "lists any exemptions and is empty by default"),
+                                 "same beam-reuse policy; no method is "
+                                 "exempted"),
            "arm_split_pct": {
                "dead_le_0.05": float(100 * (psi <= .05).mean()),
                "informative": float(100 * ((psi > .05) & (psi < .95)).mean()),

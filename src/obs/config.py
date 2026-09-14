@@ -48,9 +48,23 @@ DM_P10 = float(os.environ.get("BLOCK_P10", 0.005))
 DM_BLOCK_DB = float(os.environ.get("BLOCK_DB", 20.0))
 DM_INTERFERENCE = os.environ.get("INTERFERENCE", "0") not in ("0", "", "no")
 
-DM_N_RF = int(os.environ.get("N_RF", 8))
+_N_RF_ENV = os.environ.get("N_RF")
+
+
+def rf_chains(num_users, num_bs):
+    """Per-BS RF chains for a configuration.
+
+    A fixed value cannot serve every configuration: the assignment needs
+    M <= sum_b N_RF,b, so N_RF = 8 with B = 3 caps the system at 24 UEs. The
+    rule ceil(1.5 * M / B) scales with the deployment and reproduces the
+    nominal 8 exactly at M = 15, B = 3. The 1.5 factor matters: minimum
+    feasibility alone, ceil(M / B), sits below the unconstrained per-BS loads
+    at the optimum, so the cap would dictate the base-station split instead of
+    constraining it. Setting N_RF overrides the rule; 0 disables the cap.
+    """
+    if _N_RF_ENV is not None:
+        return int(_N_RF_ENV)
+    return int(np.ceil(1.5 * num_users / num_bs))
 
 DM_FEEDBACK_P = float(os.environ.get("FEEDBACK_P", 1.0))
 
-UNCAPPED_METHODS = tuple(
-    m for m in os.environ.get("UNCAPPED_METHODS", "").split(",") if m)

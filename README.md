@@ -65,7 +65,7 @@ random number is drawn.
 | `SIM_METHODS`, `SIM_SEED`, `OUT_DIR` | all, 0, `results` | method list, base seed, output directory |
 | `PTX_DBM`, `NF_DB` | 30, 7 | transmit power [dBm] and receiver noise figure [dB] |
 | `BLER_TABLE` | `nr_bler_table_v2.json` | which measured decoder table to use |
-| `N_RF` | 8 | per-BS RF-chain cap; `0` disables it |
+| `N_RF` | `ceil(1.5*M/B)` | per-BS RF-chain cap, applied to every method; `0` disables it |
 | `FEEDBACK_P` | 1.0 | ACK/NACK feedback reliability |
 | `DM_MIN_PATHS` | 1 | minimum ray-traced paths per link at a UE position |
 | `DM_REQUIRE_LOS` | 0 | minimum LoS links a UE position must have |
@@ -73,7 +73,6 @@ random number is drawn.
 | `RHO` | 0 | AR(1) coefficient on `ε` (0 = i.i.d. block fading) |
 | `BLOCK_P01`, `BLOCK_P10`, `BLOCK_DB` | 0, 0.005, 20 | two-state Markov blockage per link |
 | `INTERFERENCE` | 0 | drop the `q_b` orthogonal split for spatial reuse |
-| `UNCAPPED_METHODS` | *(empty)* | methods exempt from the RF-chain cap; empty means every method is capped |
 
 ## Layout
 
