@@ -5,7 +5,12 @@ from typing import List, Tuple
 
 import numpy as np
 
-from obs.utils.utils import capacitated_best, hungarian_best
+from obs.utils.utils import (
+    capacitated_best,
+    hungarian_best,
+    shared_best,
+    shared_cap_best,
+)
 
 
 class Objective(ABC):
@@ -81,6 +86,57 @@ class CapacitatedThroughputObjective(Objective):
             return beams, rates
         self.n_capped += 1
         return capacitated_best(values, self.beam_to_bs, self.cap)
+
+
+class SharedThroughputObjective(Objective):
+    """Maximize total throughput with beams SHARABLE and no per-BS cap.
+
+    Drops the one-beam-per-UE constraint of :class:`ThroughputObjective`. That
+    constraint is the only thing coupling the UEs, so the problem separates and
+    each UE independently takes its own best (beam, rate) pair.
+
+    A beam is a spatial filter, not a resource: with q_b orthogonal
+    sub-channels per BS, two UEs on the same beam occupy different
+    time-frequency resources and do not interfere.
+    """
+
+    def select_assignment(
+        self, values: np.ndarray, cumulative: np.ndarray
+    ) -> Tuple[List[int], List[int]]:
+        """Per-UE unconstrained best (beam, rate)."""
+        return shared_best(values)
+
+
+class SharedCapacitatedThroughputObjective(Objective):
+    """Beams sharable, per-BS RF-chain cap still enforced.
+
+    The physically motivated relaxation: beams cost nothing to reuse, but a BS
+    can only drive ``N_RF,b`` UEs in one slot. Evaluated lazily in the same way
+    as :class:`CapacitatedThroughputObjective` -- the separable solution is
+    computed first and the capacitated assignment is solved only when the cap
+    is actually exceeded.
+
+    ``n_calls`` / ``n_capped`` count how often the fallback fired.
+    """
+
+    def __init__(self, beam_to_bs: np.ndarray, cap: np.ndarray):
+        self.beam_to_bs = np.asarray(beam_to_bs)
+        self.cap = np.asarray(cap)
+        self.num_bs = len(self.cap)
+        self.n_calls = 0
+        self.n_capped = 0
+
+    def select_assignment(
+        self, values: np.ndarray, cumulative: np.ndarray
+    ) -> Tuple[List[int], List[int]]:
+        """Separable solution first; the capacitated one only if the cap binds."""
+        beams, rates = shared_best(values)
+        self.n_calls += 1
+        load = np.bincount(self.beam_to_bs[beams], minlength=self.num_bs)
+        if (load <= self.cap).all():
+            return beams, rates
+        self.n_capped += 1
+        return shared_cap_best(values, self.beam_to_bs, self.cap)
 
 
 class ProportionalFairnessObjective(Objective):

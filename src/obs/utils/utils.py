@@ -392,3 +392,95 @@ def capacitated_best(
         raise RuntimeError("capacitated assignment LP returned a fractional vertex")
     chosen_rates = [int(best_r[u, chosen_beams[u]]) for u in range(U)]
     return chosen_beams, chosen_rates
+
+
+def shared_best(values: np.ndarray) -> Tuple[List[int], List[int]]:
+    """Optimal assignment when beams are SHARABLE and BS load is unconstrained.
+
+    Dropping the one-beam-per-UE constraint removes the only coupling between
+    UEs, so the problem separates: each UE independently takes the
+    (beam, rate) pair maximizing its own expected throughput. No matching is
+    needed, and this is exact rather than a relaxation.
+
+    A beam is a spatial filter, not a resource. Under the default model each BS
+    divides its carrier into q_b orthogonal sub-channels, so two UEs served on
+    the same beam occupy different time-frequency resources and do not
+    interfere; beam exclusivity is a modelling choice, not a physical
+    requirement.
+
+    Parameters
+    ----------
+    values : np.ndarray
+        Array of shape (num_users, total_beams, num_rates).
+
+    Returns
+    -------
+    tuple
+        ``(chosen_beams, chosen_rates)``, one entry per user. Beam indices may
+        repeat.
+    """
+    U, Btot, R = values.shape
+    flat = values.reshape(U, Btot * R).argmax(axis=1)
+    chosen_beams = (flat // R).astype(int).tolist()
+    chosen_rates = (flat % R).astype(int).tolist()
+    return chosen_beams, chosen_rates
+
+
+def shared_cap_best(
+    values: np.ndarray, beam_to_bs: np.ndarray, cap: np.ndarray
+) -> Tuple[List[int], List[int]]:
+    """Beams sharable, but each BS serves at most ``cap[b]`` UEs per slot.
+
+    With beams free the only contested resource is the RF chain, so this is a
+    transportation problem on UE -> BS alone. Replicating BS ``b`` into
+    ``cap[b]`` interchangeable slots turns it into a square assignment problem
+    over ``U x sum(cap)``, which the Hungarian algorithm solves exactly; no LP
+    and no rounding are involved.
+
+    Within its assigned BS a UE simply takes its best (beam, rate) pair, since
+    beams carry no capacity of their own.
+
+    Parameters
+    ----------
+    values : np.ndarray
+        Array of shape (num_users, total_beams, num_rates).
+    beam_to_bs : np.ndarray
+        Length ``total_beams``; ``beam_to_bs[k]`` is the BS owning beam ``k``.
+    cap : np.ndarray
+        Length ``num_bs``; per-BS RF-chain capacity.
+
+    Returns
+    -------
+    tuple
+        ``(chosen_beams, chosen_rates)``, one entry per user.
+    """
+    U, Btot, R = values.shape
+    beam_to_bs = np.asarray(beam_to_bs)
+    cap = np.asarray(cap, dtype=int)
+    nbs = len(cap)
+    if int(cap.sum()) < U:
+        raise ValueError(
+            f"infeasible: total RF chains {int(cap.sum())} < users {U}"
+        )
+
+    best_r = values.argmax(axis=2)
+    scores = np.take_along_axis(values, best_r[..., None], axis=2).squeeze(-1)
+
+    # Best beam per (UE, BS), and its score.
+    masks = [beam_to_bs == b for b in range(nbs)]
+    beam_of_bs = np.empty((U, nbs), dtype=int)
+    score_of_bs = np.empty((U, nbs))
+    for b, m in enumerate(masks):
+        idx = np.flatnonzero(m)
+        local = scores[:, idx].argmax(axis=1)
+        beam_of_bs[:, b] = idx[local]
+        score_of_bs[:, b] = scores[:, idx][np.arange(U), local]
+
+    slots = np.repeat(np.arange(nbs), cap)
+    row_ind, col_ind = linear_sum_assignment(-score_of_bs[:, slots])
+    bs_of_ue = np.empty(U, dtype=int)
+    bs_of_ue[row_ind] = slots[col_ind]
+
+    chosen_beams = [int(beam_of_bs[u, bs_of_ue[u]]) for u in range(U)]
+    chosen_rates = [int(best_r[u, chosen_beams[u]]) for u in range(U)]
+    return chosen_beams, chosen_rates

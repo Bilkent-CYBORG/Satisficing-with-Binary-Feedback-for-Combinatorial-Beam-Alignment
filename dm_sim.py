@@ -40,7 +40,8 @@ import os
 import numpy as np
 
 from obs.config import (
-    DM_NOISE_DBM, DM_PTX_DBM, DM_SCENARIO, MODEL_NAME, NR_RATE_SET, rf_chains,
+    DM_BEAM_EXCLUSIVE, DM_NOISE_DBM, DM_PTX_DBM, DM_SCENARIO, MODEL_NAME,
+    NR_RATE_SET, rf_chains,
 )
 from obs.simulation.bler import (
     BLER_TABLE_PATH, measured_bler, measured_success_prob, success_prob,

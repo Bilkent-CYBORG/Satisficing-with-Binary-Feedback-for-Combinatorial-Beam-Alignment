@@ -66,6 +66,7 @@ random number is drawn.
 | `PTX_DBM`, `NF_DB` | 30, 7 | transmit power [dBm] and receiver noise figure [dB] |
 | `BLER_TABLE` | `nr_bler_table_v2.json` | which measured decoder table to use |
 | `N_RF` | `ceil(1.5*M/B)` | per-BS RF-chain cap, applied to every method; `0` disables it |
+| `BEAM_EXCLUSIVE` | 1 | `1` = a codeword serves at most one UE per slot; `0` lets UEs share a beam |
 | `FEEDBACK_P` | 1.0 | ACK/NACK feedback reliability |
 | `DM_MIN_PATHS` | 1 | minimum ray-traced paths per link at a UE position |
 | `DM_REQUIRE_LOS` | 0 | minimum LoS links a UE position must have |

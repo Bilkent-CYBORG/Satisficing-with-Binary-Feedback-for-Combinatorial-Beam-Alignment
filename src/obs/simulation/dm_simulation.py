@@ -11,9 +11,14 @@ import time
 
 import numpy as np
 
-from obs.algorithms.combinatorial.objectives import CapacitatedThroughputObjective
+from obs.algorithms.combinatorial.objectives import (
+    CapacitatedThroughputObjective,
+    SharedCapacitatedThroughputObjective,
+    SharedThroughputObjective,
+)
 from obs.config import (
     DM_BLOCK_DB,
+    DM_BEAM_EXCLUSIVE,
     DM_FEEDBACK_P,
     DM_INTERFERENCE,
     rf_chains,
@@ -46,7 +51,7 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
         crn=True, seed=0, methods=None,
         save_selections=True, selection_stride=1, metric_stride=10,
         n_paths=3, n_rf=None, interference=None, rho=None, p01=None, p10=None,
-        feedback_p=None):
+        feedback_p=None, beam_exclusive=None):
     """Run the selected methods on the ray-traced channel.
 
     Three regret definitions are recorded per slot, because they diverge in the
@@ -66,10 +71,12 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
     methods = list(methods) if methods else list(NAMES)
     n_rf = rf_chains(num_users, num_bs) if n_rf is None else n_rf
     feedback_p = DM_FEEDBACK_P if feedback_p is None else float(feedback_p)
+    beam_exclusive = (DM_BEAM_EXCLUSIVE if beam_exclusive is None
+                      else int(beam_exclusive))
     interference = DM_INTERFERENCE if interference is None else interference
     rng = np.random.default_rng(seed)
     tb = num_bs * K
-    if num_users > tb:
+    if beam_exclusive and num_users > tb:
         raise ValueError(
             f"{num_users} users but only {tb} beams (B*K); every user needs a "
             f"distinct beam")
@@ -81,10 +88,14 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
     beam_to_bs = np.repeat(np.arange(num_bs), K)
     if n_rf and n_rf > 0:
         cap = np.full(num_bs, int(n_rf))
-        objective = CapacitatedThroughputObjective(beam_to_bs, cap)
+        objective = (CapacitatedThroughputObjective(beam_to_bs, cap)
+                     if beam_exclusive
+                     else SharedCapacitatedThroughputObjective(beam_to_bs, cap))
     else:
-        cap, objective = None, None
-    gstar = optimal_throughput(psi, rate_set, beam_to_bs, cap)
+        cap = None
+        objective = None if beam_exclusive else SharedThroughputObjective()
+    gstar = optimal_throughput(psi, rate_set, beam_to_bs, cap,
+                               beam_exclusive=bool(beam_exclusive))
 
     Z = lambda: {n: np.zeros((n_exp, T)) for n in methods}
     reg, reg_only, reg_std = Z(), Z(), Z()
@@ -215,6 +226,7 @@ def run(num_users=15, num_bs=3, N=64, K=120, T=10000, n_exp=5,
             "n_paths": n_paths, "geometry": geo_meta,
             "n_rf": (int(n_rf) if n_rf else 0),
             "feedback_p": float(feedback_p),
+            "beam_exclusive": bool(beam_exclusive),
             "interference": bool(interference),
             "interference_note": (_INTERFERENCE_ON_NOTE if interference
                                   else _INTERFERENCE_OFF_NOTE),

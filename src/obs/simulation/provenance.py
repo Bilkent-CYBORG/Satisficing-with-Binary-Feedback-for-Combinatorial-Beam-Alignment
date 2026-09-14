@@ -12,6 +12,7 @@ import numpy as np
 
 from obs.config import (
     DM_B_SC,
+    DM_BEAM_EXCLUSIVE,
     DM_FEEDBACK_P,
     DM_MCS_INDICES,
     DM_MIN_PATHS,
@@ -41,6 +42,12 @@ def link_budget_config(n_paths=3):
         "antenna_spacing_lambda": 0.5,
         "n_paths_kept": n_paths,
         "min_paths_per_link": DM_MIN_PATHS,
+        "beam_exclusive": bool(DM_BEAM_EXCLUSIVE),
+        "beam_sharing_note": ("BEAM_EXCLUSIVE=0 lets several UEs share a "
+                              "codeword. A beam is a spatial filter, and the "
+                              "q_b orthogonal sub-channels keep co-scheduled "
+                              "UEs on disjoint time-frequency resources, so "
+                              "sharing a beam creates no interference."),
         "feedback_p": DM_FEEDBACK_P,
         "feedback_note": ("reliability of the ACK/NACK channel; the learner sees "
                           "the flipped bit with probability 1-p, while throughput "

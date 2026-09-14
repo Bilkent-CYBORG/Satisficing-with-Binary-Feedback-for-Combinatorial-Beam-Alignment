@@ -48,7 +48,8 @@ def estimate_psi(users, rate_set, p_block=None, block_db=None):
     return psi
 
 
-def optimal_throughput(psi, rate_set, beam_to_bs=None, cap=None):
+def optimal_throughput(psi, rate_set, beam_to_bs=None, cap=None,
+                       beam_exclusive=True):
     """Clairvoyant per-UE throughput under the assignment constraint.
 
     If ``beam_to_bs``/``cap`` are given, the benchmark obeys the SAME per-BS
@@ -61,6 +62,15 @@ def optimal_throughput(psi, rate_set, beam_to_bs=None, cap=None):
     val = rate_set[None, None, :] * psi
     best_r = val.argmax(axis=2)
     score = np.take_along_axis(val, best_r[..., None], axis=2)[..., 0]
+    if not beam_exclusive:
+        from obs.utils.utils import shared_best, shared_cap_best
+        if cap is not None and len(cap):
+            bi, ri = shared_cap_best(val, np.asarray(beam_to_bs),
+                                     np.asarray(cap))
+        else:
+            bi, ri = shared_best(val)
+        return sum(rate_set[ri[u]] * psi[u, bi[u], ri[u]]
+                   for u in range(len(psi))) / len(psi)
     if cap is not None and len(cap):
         _, ci = linear_sum_assignment(-score)
         load = np.bincount(np.asarray(beam_to_bs)[ci], minlength=len(cap))
