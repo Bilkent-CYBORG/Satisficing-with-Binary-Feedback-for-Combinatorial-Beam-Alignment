@@ -12,6 +12,8 @@ class CUCBAgent(CombinatorialAlgorithm):
     """Combinatorial UCB algorithm with Hoeffding confidence bounds.
 
     Maintains internal n_plays and psi_hat (empirical success probability).
+    The index is clipped at 1, which is the standard form: psi is a
+    probability, so an optimistic estimate above 1 is not attainable.
     """
 
     def __init__(
@@ -20,14 +22,8 @@ class CUCBAgent(CombinatorialAlgorithm):
         total_beams: int,
         rate_set: np.ndarray,
         objective: Optional[Objective] = None,
-        clip: bool = False,
     ):
-        # clip=True is the standard CUCB index, min(psi_hat + rad, 1). psi is a
-        # probability, so an index above 1 is not attainable; leaving it
-        # unclipped inflates rarely-played arms without bound. Default False
-        # preserves the behaviour every stored result was produced with.
         super().__init__(num_users, total_beams, rate_set, objective)
-        self.clip = clip
         self._init_state()
 
     def _init_state(self):
@@ -40,16 +36,17 @@ class CUCBAgent(CombinatorialAlgorithm):
     def select_action(self, t: int) -> Tuple[List[int], List[int]]:
         """Select action using UCB on success probabilities.
 
-        Matches Algorithm 2: the confidence radius is sqrt(3 log t / 2n), and
-        an arm that has never been played carries UCB = +infinity so it is
-        always preferred over any arm with a finite index.
+        Matches Algorithm 2: the confidence radius is sqrt(3 log t / 2n), the
+        index is capped at 1, and an arm that has never been played carries
+        UCB = +infinity so it is always preferred over any finite index.
         """
         seen = self.n_plays > 0
         n = np.maximum(1, self.n_plays)
         conf = np.sqrt(1.5 * np.log(max(2, t)) / n)  # = sqrt(3 log t / 2n)
-        ucb = self.psi_hat + conf
-        if self.clip:
-            ucb = np.minimum(ucb, 1.0)
+        # psi is a probability, so an index above 1 is not attainable. The
+        # standard CUCB index is min(psi_hat + rad, 1); leaving it unclipped
+        # inflates rarely-played arms without bound.
+        ucb = np.minimum(self.psi_hat + conf, 1.0)
         theta_ucb = self.rate_set[None, None, :] * ucb
         # +inf cannot be handed to the assignment solver. Any sentinel strictly
         # above the largest achievable finite index is equivalent: psi <= 1, so

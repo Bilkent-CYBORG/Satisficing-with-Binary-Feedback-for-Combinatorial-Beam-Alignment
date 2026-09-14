@@ -53,4 +53,4 @@ DM_N_RF = int(os.environ.get("N_RF", 8))
 DM_FEEDBACK_P = float(os.environ.get("FEEDBACK_P", 1.0))
 
 UNCAPPED_METHODS = tuple(
-    m for m in os.environ.get("UNCAPPED_METHODS", "CUCB,CUCB-clip").split(",") if m)
+    m for m in os.environ.get("UNCAPPED_METHODS", "").split(",") if m)

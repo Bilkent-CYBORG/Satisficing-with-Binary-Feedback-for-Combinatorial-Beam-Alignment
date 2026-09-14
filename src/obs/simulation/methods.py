@@ -9,7 +9,7 @@ from obs.algorithms.combinatorial import (
 )
 
 NAMES = ["SAT-CTS", "SAT-CTS-Retain", "SAT-CTS-Init", "SAT-CTS-Retain-Init",
-         "CTS", "CUCB", "CUCB-clip"]
+         "CTS", "CUCB"]
 NAMES_G = ["SAT-CTS-InitG2", "SAT-CTS-InitG5", "SAT-CTS-InitG10",
            "SAT-CTS-RetainInitG2", "SAT-CTS-RetainInitG5",
            "SAT-CTS-RetainInitG10"]
@@ -28,16 +28,15 @@ STYLE = {
     "SAT-CTS-W":           dict(color="#FF2C00", ls="-",  marker="s"),
     "CTS":                 dict(color="#0C5DA5", ls="-.", marker="^"),
     "CUCB":                dict(color="#FF9500", ls=":",  marker="D"),
-    "CUCB-clip":           dict(color="#E36414", ls=(0, (3, 1, 1, 1)), marker="v"),
 }
 
 
 def make_agents(methods, num_users, tb, rate_set, target, objective):
     """Fresh agent instances for one experiment.
 
-    `objective` carries the per-BS RF-chain cap. CUCB is passed None instead --
-    see UNCAPPED_METHODS in obs.config for why the exemption exists and why it
-    can only help the baseline.
+    Every method receives the SAME `objective`, so every method optimises over
+    the same feasible assignment set under the same per-BS RF-chain cap and the
+    same beam-reuse policy. No baseline is exempted.
     """
     def sat(reset, init=False, group=None):
         kw = {} if group is None else {"init_group_size": group}
@@ -61,9 +60,7 @@ def make_agents(methods, num_users, tb, rate_set, target, objective):
         "CTS":            lambda: CTSAgent(num_users, tb, rate_set,
                                            objective=objective),
         "CUCB":           lambda: CUCBAgent(num_users, tb, rate_set,
-                                            objective=None),
-        "CUCB-clip":      lambda: CUCBAgent(num_users, tb, rate_set,
-                                            objective=None, clip=True),
+                                            objective=objective),
     }
     bad = [m for m in methods if m not in pool]
     if bad:

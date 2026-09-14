@@ -103,6 +103,11 @@ def main():
            "total_beams": nbs * Kb, "base_arms": M * nbs * Kb * len(NR_RATE_SET),
            "crn": res["crn"], "selection_stride": res["selection_stride"],
            "N_RF_per_bs": res["n_rf"], "rf_cap_stats": res["rf_cap_stats"],
+           "uncapped_methods": res["uncapped_methods"],
+           "feasible_set_note": ("every method receives the same assignment "
+                                 "oracle, the same per-BS RF-chain cap and the "
+                                 "same beam-reuse policy; uncapped_methods "
+                                 "lists any exemptions and is empty by default"),
            "arm_split_pct": {
                "dead_le_0.05": float(100 * (psi <= .05).mean()),
                "informative": float(100 * ((psi > .05) & (psi < .95)).mean()),

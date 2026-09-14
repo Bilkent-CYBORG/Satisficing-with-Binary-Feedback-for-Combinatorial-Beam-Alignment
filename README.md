@@ -73,7 +73,7 @@ random number is drawn.
 | `RHO` | 0 | AR(1) coefficient on `ε` (0 = i.i.d. block fading) |
 | `BLOCK_P01`, `BLOCK_P10`, `BLOCK_DB` | 0, 0.005, 20 | two-state Markov blockage per link |
 | `INTERFERENCE` | 0 | drop the `q_b` orthogonal split for spatial reuse |
-| `UNCAPPED_METHODS` | `CUCB,CUCB-clip` | methods exempt from the RF-chain cap |
+| `UNCAPPED_METHODS` | *(empty)* | methods exempt from the RF-chain cap; empty means every method is capped |
 
 ## Layout
 
